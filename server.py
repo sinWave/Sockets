@@ -1,7 +1,7 @@
 import socket
 from sys import getsizeof
 
-# ----------------------- MAIN -----------------------
+# /////////////////////// MAIN ///////////////////////
 
 def main():
     HOST = 'localhost'
@@ -19,17 +19,20 @@ def main():
         with conn:
             communicate(conn, addr, whitelist)
 
-# ----------------------- COMM -----------------------
+# /////////////////////// COMM ///////////////////////
 
 def communicate(conn, addr, whitelist):
     print(f'\nConnected by: {addr}.')
     print("Waiting for client...")
 
+    # ----------------------- First recv -----------------------
     # Client requests message size
     while True:
         tBytes = conn.recv(1024)
 
         if not tBytes: break
+            
+    # ----------------------------------------------------------
 
     print("Client requests message size.")
 
@@ -41,7 +44,7 @@ def communicate(conn, addr, whitelist):
     totalBytes = len(size)
     tBytes = 0
 
-    # Send
+    # ----------------------- First send -----------------------
     while True:
         tBytes = conn.send(size[sentBytes:])
 
@@ -52,14 +55,19 @@ def communicate(conn, addr, whitelist):
         if sentBytes >= totalBytes: break
         
         sentBytes = sentBytes + getsizeof(tBytes)
+        
+    # ----------------------------------------------------------
 
     print("Whitelist size sent.")
 
+    # ----------------------- Second recv -----------------------
     # Client requests actual message
     while True:
         tBytes = conn.recv(totalBytes)
 
         if not tBytes: break
+            
+    # ----------------------------------------------------------
 
     print("Client requests actual whitelist.")
 
@@ -67,7 +75,7 @@ def communicate(conn, addr, whitelist):
     totalBytes = len(t)
     tBytes = 0
 
-    # Send
+    # ----------------------- Second send -----------------------
     while True:
         tBytes = conn.send(t[sentBytes:])
 
@@ -78,12 +86,14 @@ def communicate(conn, addr, whitelist):
         if tBytes >= totalBytes: break
         
         sentBytes = sentBytes + getsizeof(tBytes)
+        
+    # ----------------------------------------------------------
 
     print("Whitelist sent.")
 
     return
 
-# ----------------------- ENCO -----------------------
+# /////////////////////// ENCO ///////////////////////
 
 def encoder(whitelist):
     t = '' # Simplify dict to list object
